@@ -5,9 +5,11 @@ import { URL } from 'url';
 export class WebCrawler {
 
     startUrl: string;
+    visitedUrls: Set<string>;
 
     constructor(startUrl: string) {
         this.startUrl = startUrl;
+        this.visitedUrls = new Set();
     }
 
     async fetchPageContent(): Promise<string> {
@@ -39,5 +41,32 @@ export class WebCrawler {
         });
 
         return links;
+    }
+
+    async crawl(url: string = this.startUrl): Promise<Set<string>> {
+        if (this.visitedUrls.has(url)) {
+            return this.visitedUrls;
+        }
+
+        this.visitedUrls.add(url);
+        console.log(`Crawling: ${url}`);
+
+        const pageContent = await this.fetchPageContent();
+        if (pageContent) {
+            const links = this.extractLinks(pageContent);
+            for (const link of links) {
+                if (this.isSameDomain(link)) {
+                    await this.crawl(link);
+                }
+            }
+        };
+
+        return this.visitedUrls;
+    }
+
+    isSameDomain(link: string): boolean {
+        const linkUrl = new URL(link);
+        const baseUrl = new URL(this.startUrl);
+        return linkUrl.origin === baseUrl.origin;
     }
 }
