@@ -1,4 +1,6 @@
 import axios from 'axios';
+import * as cheerio from 'cheerio';
+import { URL } from 'url';
 
 export class WebCrawler {
 
@@ -21,5 +23,21 @@ export class WebCrawler {
             }
             return '';
         }
+    }
+
+    extractLinks(htmlContent: string) {
+        const $ = cheerio.load(htmlContent);
+        const links = new Set<string>();
+        const baseUrl = new URL(this.startUrl);
+
+        $('a[href]').each((_, element) => {
+            const href = $(element).attr('href');
+            if (href) {
+                const url = new URL(href, baseUrl.origin).href;
+                links.add(url.toString());
+            }
+        });
+
+        return links;
     }
 }
