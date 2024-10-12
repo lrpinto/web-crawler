@@ -30,16 +30,56 @@ This project is a simple web crawler built using TypeScript. It crawls pages wit
     ```
 
 ## Running the Crawler
-To run the crawler via CLI, use the following command:
+
+### Development mode
+
+To run the crawler in development mode using ts-node, use the following command:
 ```bash
 npm run dev -- <starting-url>
 ```
+
+This run the Typescript files directly without the need to compile them first.
+
+### Production mode
+
+1. To run the crawler in production mode, first compile the Typescript files using the following command:
+   ```bash  
+   npm run build
+   ```
+   
+   This compiles the TypeScript files and outputs the JavaScript files into the dist directory.
+
+
+2. Then run the compiled JavaScript files using the following command:
+   ```bash
+   npm run prod -- <starting-url>
+   ```
+
+## Formatting the code
+
+To format the code using Prettier, run the following command:
+```bash
+npm run format
+```
+
+This will format all TypeScript files inside the `src` directory.
+
+## Linting the code
+
+To lint the code using ESLint, run the following command:
+```bash
+npm run lint
+```
+
+This checks for code quality issues and attempts to fix them where possible.
 
 ## Running the tests
 To run the tests run the following command:
 ```bash
 npm test
 ```
+
+This runs the Jest test suite to ensure all functionality works as expected.
 
 ## Design Decisions
 **Concurrency**: `Promise.all` is used to handle concurrent crawling of multiple URLs to speed up the process.
