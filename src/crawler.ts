@@ -18,12 +18,7 @@ export class WebCrawler {
             const response = await axios.get(url);
             return response.data;
         } catch (error) {
-            // FIXME: This is a temporary solution to handle errors
-            if (error instanceof Error) {
-                Logger.error(`Error fetching page: ${error.message}`);
-            } else {
-                Logger.error(`Unknown error occurred`);
-            }
+            Logger.error(`Error fetching page`, error);
             return '';
         }
     }
