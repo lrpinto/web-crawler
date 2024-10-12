@@ -33,3 +33,11 @@ This project is a simple web crawler built using TypeScript. It crawls pages wit
 To run the crawler via CLI, use the following command:
 ```bash
 npm run start -- <starting-url>
+```
+
+## Running the tests
+To run the tests run the following command:
+```bash
+npm test
+```
+
