@@ -10,9 +10,9 @@
     "prod": "node dist/cli.js",
     "test": "jest"
   },
-  "keywords": [],
+  "keywords": ["crwaler", "web-crawler", "cli", "web-crawling", "web-scraping", "web-scraper", "web-sc"],
   "author": "Luisa R. Pinto",
-  "license": "ISC",
+  "license": "Private",
   "description": "A Web Crawling CLI",
   "devDependencies": {
     "@eslint/js": "^9.12.0",
