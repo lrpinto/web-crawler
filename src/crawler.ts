@@ -1,6 +1,7 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { URL } from 'url';
+import { Logger } from './logger';
 
 export class WebCrawler {
 
@@ -19,9 +20,9 @@ export class WebCrawler {
         } catch (error) {
             // FIXME: This is a temporary solution to handle errors
             if (error instanceof Error) {
-                console.error(`Error fetching page: ${error.message}`);
+                Logger.error(`Error fetching page: ${error.message}`);
             } else {
-                console.error(`Unknown error occurred`);
+                Logger.error(`Unknown error occurred`);
             }
             return '';
         }
@@ -45,17 +46,19 @@ export class WebCrawler {
 
     async crawl(url: string = this.startUrl): Promise<Set<string>> {
         if (this.visitedUrls.has(url)) {
-            console.log(`Already visited: ${url}`);
+            Logger.info(`Already visited: ${url}`);
             return this.visitedUrls;
         }
 
         this.visitedUrls.add(url);
-        console.log(`Crawling: ${url}`);
+        Logger.info(`Crawling: ${url}`);
 
         const pageContent = await this.fetchPageContent(url);
         if (!pageContent) return this.visitedUrls;
 
         const links = this.extractLinks(pageContent);
+        Logger.info(`Links found on ${url}: ${[...links].join(', ')}`);
+
         const crawlPromises: Promise<Set<string>>[] = [];
 
         for (const link of links) {
