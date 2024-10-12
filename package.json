@@ -3,20 +3,30 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node src/cli.ts",
+    "build": "tsc",
+    "format": "prettier --write src/**/*.ts",
+    "lint": "eslint src --fix",
+    "dev": "ts-node src/cli.ts",
+    "prod": "node dist/cli.js",
     "test": "jest"
   },
   "keywords": [],
-  "author": "",
+  "author": "Luisa R. Pinto",
   "license": "ISC",
-  "description": "",
+  "description": "A Web Crawling CLI",
   "devDependencies": {
+    "@eslint/js": "^9.12.0",
     "@types/jest": "^29.5.13",
     "@types/node": "^22.7.5",
+    "eslint": "^9.12.0",
+    "eslint-config-prettier": "^9.1.0",
+    "globals": "^15.11.0",
     "jest": "^29.7.0",
+    "prettier": "3.3.3",
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
-    "typescript": "^5.6.3"
+    "typescript": "^5.6.3",
+    "typescript-eslint": "^8.8.1"
   },
   "dependencies": {
     "axios": "^1.7.7",
