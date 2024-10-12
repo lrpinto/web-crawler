@@ -41,3 +41,8 @@ To run the tests run the following command:
 npm test
 ```
 
+## Design Decisions
+**Concurrency**: `Promise.all` is used to handle concurrent crawling of multiple URLs to speed up the process.
+**Error Handling**: Any network errors or non-200 HTTP responses are logged using a custom logger that internally uses `console.log`.
+**Modularisation**: Mock data, URLs, and Axios mocking functions are separated into fixtures and utility files to keep the code organised.
+**Testing**: Comprehensive test cases are written using Jest to cover multiple aspects such as link extraction, error handling, and cyclic links.
