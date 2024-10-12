@@ -1,18 +1,13 @@
 import axios from "axios";
 import { describe } from "node:test";
+import { mockAxiosGet, mockedAxios } from "../__fixtures__/mockAxios";
 import { WebCrawler } from '../src/crawler';
 import { Logger } from "../src/logger";
 import { mockPages } from '../__fixtures__/mockPages';
 
-jest.mock('axios');
 jest.mock('../src/logger');
 
 describe(WebCrawler.name, () => {
-    let mockedAxios: jest.Mocked<typeof axios>;
-
-    beforeEach(() => {
-        mockedAxios = axios as jest.Mocked<typeof axios>;
-    });
 
     afterEach(() => {
         jest.clearAllMocks();
@@ -24,9 +19,9 @@ describe(WebCrawler.name, () => {
     });
 
     test('Web Crawler can fetch page content', async () => {
-        mockedAxios.get.mockImplementation(async () => {
-            return Promise.resolve({data: '<html></html>', status: 200});
-        });
+        mockAxiosGet({
+            'https://example.com': {data: '<html></html>', status: 200}
+        })
 
         const crawler = new WebCrawler('https://example.com');
         const content = await crawler.fetchPageContent();
@@ -38,32 +33,21 @@ describe(WebCrawler.name, () => {
 
         const links = crawler.extractLinks(mockPages.page1);
         expect(links).toEqual(new Set([
-            'http://example.com/page1',
             'https://example.com/page2',
-            'https://external.com/page2'
+            'https://external.com/page3'
         ]));
     });
 
     test('WebCrawler can crawl multiple pages within the same domain', async () => {
-
-        mockedAxios.get.mockImplementation(async (url: string) => {
-            const { page1, page2, page3 } = mockPages;
-            switch (url) {
-                case 'https://example.com/page1':
-                    return Promise.resolve({data: page1, status: 200});
-                case 'https://example.com/page2':
-                    return Promise.resolve({data: page2, status: 200});
-                case 'https://example.com/page3':
-                    return Promise.resolve({data: page3, status: 200});
-                default:
-                    return Promise.resolve({data: ''});
-            }
+        const { page1, page2, page3 } = mockPages;
+        mockAxiosGet({
+            'https://example.com/page1': {data: page1, status: 200},
+            'https://example.com/page2': {data: page2, status: 200},
+            'https://example.com/page3': {data: page3, status: 200},
         });
 
         const crawler = new WebCrawler('https://example.com/page1');
         const links = await crawler.crawl();
-
-        console.log(links);
 
         expect(links).toEqual(new Set([
             'https://example.com/page1',
