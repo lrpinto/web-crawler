@@ -23,7 +23,7 @@ test('Web Crawler can fetch page content', async () => {
     expect(content).toContain('<html>');
 });
 
-test('Web Crawler can extrcat links from page content', async () => {
+test('Web Crawler can extract links from page content', async () => {
     const crawler = new WebCrawler('https://example.com');
 
     const htmlContent = `
