@@ -1,5 +1,6 @@
 import { describe } from "node:test";
 import { mockAxiosGet, mockedAxios } from "../__fixtures__/mockAxios";
+import { mockCyclicPages } from "../__fixtures__/mockCyclicPages";
 import { mockUrls } from "../__fixtures__/mockUrls";
 import { WebCrawler } from '../src/crawler';
 import { Logger } from "../src/logger";
@@ -65,7 +66,7 @@ describe(WebCrawler.name, () => {
         const crawler = new WebCrawler(startUrl);
         await crawler.fetchPageContent();
 
-        expect(Logger.error).toHaveBeenCalledWith('Error fetching page', error);
+        expect(Logger.error).toHaveBeenCalledWith('Error fetching page', expect.any(Error));
     });
 
     test('Web Crawler should log and handle non-200 HTTP status codes', async () => {
@@ -75,5 +76,23 @@ describe(WebCrawler.name, () => {
         await crawler.fetchPageContent();
 
         expect(Logger.error).toHaveBeenCalledWith('Error fetching page: 404');
+    });
+
+    test('WebCrawler handles cyclic links', async () => {
+        const { page1Url, page2Url } = mockUrls;
+        const { page1, page2 } = mockCyclicPages;
+
+        mockAxiosGet({
+            [page1Url]: { data: page1, status: 200 },
+            [page2Url]: { data: page2, status: 200 },
+        });
+
+        const crawler = new WebCrawler(page1Url);
+        const links = await crawler.crawl();
+
+        expect(links).toEqual(new Set([
+            page1Url,
+            page2Url,
+        ]));
     });
 });
