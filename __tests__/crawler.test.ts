@@ -44,8 +44,8 @@ test('WebCrawler can crawl multiple pages within the same domain', async () => {
     const page1 = `
     <html>
       <body>
-        <a href="http://example.com/page2">Page 2</a>
-        <a href="http://external.com/page3">External Page</a>
+        <a href="https://example.com/page2">Page 2</a>
+        <a href="https://external.com/page3">External Page</a>
       </body>
     </html>
   `;
@@ -53,7 +53,7 @@ test('WebCrawler can crawl multiple pages within the same domain', async () => {
     const page2 = `
     <html>
       <body>
-        <a href="http://example.com/page3">Page 3</a>
+        <a href="https://example.com/page3">Page 3</a>
       </body>
     </html>
   `;
@@ -74,15 +74,17 @@ test('WebCrawler can crawl multiple pages within the same domain', async () => {
                 return Promise.resolve({data: page3});
             default:
                 return Promise.resolve({data: ''});
-        };
-
-        const crawler = new WebCrawler('https://example.com/page1');
-        const links = await crawler.crawl();
-
-        expect(links).toEqual(new Set([
-            'https://example.com/page1',
-            'https://example.com/page2',
-            'https://example.com/page3'
-        ]));
+        }
     });
+
+    const crawler = new WebCrawler('https://example.com/page1');
+    const links = await crawler.crawl();
+
+    console.log(links);
+
+    expect(links).toEqual(new Set([
+        'https://example.com/page1',
+        'https://example.com/page2',
+        'https://example.com/page3'
+    ]));
 });

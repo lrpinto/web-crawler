@@ -12,9 +12,9 @@ export class WebCrawler {
         this.visitedUrls = new Set();
     }
 
-    async fetchPageContent(): Promise<string> {
+    async fetchPageContent(url: string = this.startUrl): Promise<string> {
         try {
-            const response = await axios.get(this.startUrl);
+            const response = await axios.get(url);
             return response.data;
         } catch (error) {
             // FIXME: This is a temporary solution to handle errors
@@ -45,22 +45,26 @@ export class WebCrawler {
 
     async crawl(url: string = this.startUrl): Promise<Set<string>> {
         if (this.visitedUrls.has(url)) {
+            console.log(`Already visited: ${url}`);
             return this.visitedUrls;
         }
 
         this.visitedUrls.add(url);
         console.log(`Crawling: ${url}`);
 
-        const pageContent = await this.fetchPageContent();
-        if (pageContent) {
-            const links = this.extractLinks(pageContent);
-            for (const link of links) {
-                if (this.isSameDomain(link)) {
-                    await this.crawl(link);
-                }
-            }
-        };
+        const pageContent = await this.fetchPageContent(url);
+        if (!pageContent) return this.visitedUrls;
 
+        const links = this.extractLinks(pageContent);
+        const crawlPromises: Promise<Set<string>>[] = [];
+
+        for (const link of links) {
+            if (this.isSameDomain(link) && !this.visitedUrls.has(link)) {
+                crawlPromises.push(this.crawl(link));
+            }
+        }
+
+        await Promise.all(crawlPromises);
         return this.visitedUrls;
     }
 
