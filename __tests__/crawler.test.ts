@@ -2,6 +2,7 @@ import axios from "axios";
 import { describe } from "node:test";
 import { WebCrawler } from '../src/crawler';
 import { Logger } from "../src/logger";
+import { mockPages } from '../__fixtures__/mockPages';
 
 jest.mock('axios');
 jest.mock('../src/logger');
@@ -35,45 +36,18 @@ describe(WebCrawler.name, () => {
     test('Web Crawler can extract links from page content', async () => {
         const crawler = new WebCrawler('https://example.com');
 
-        const htmlContent = `
-    <html>
-      <body>
-        <a href="http://example.com/page1">Page 1</a>
-        <a href="/page2">Page 2</a>
-      </body>
-    </html>
-  `;
-
-        const links = crawler.extractLinks(htmlContent);
-        expect(links).toEqual(new Set(['http://example.com/page1', 'https://example.com/page2']));
+        const links = crawler.extractLinks(mockPages.page1);
+        expect(links).toEqual(new Set([
+            'http://example.com/page1',
+            'https://example.com/page2',
+            'https://external.com/page2'
+        ]));
     });
 
     test('WebCrawler can crawl multiple pages within the same domain', async () => {
 
-        const page1 = `
-    <html>
-      <body>
-        <a href="https://example.com/page2">Page 2</a>
-        <a href="https://external.com/page3">External Page</a>
-      </body>
-    </html>
-  `;
-
-        const page2 = `
-    <html>
-      <body>
-        <a href="https://example.com/page3">Page 3</a>
-      </body>
-    </html>
-  `;
-
-        const page3 = `
-    <html>
-      <body>No links here</body>
-    </html>
-  `;
-
         mockedAxios.get.mockImplementation(async (url: string) => {
+            const { page1, page2, page3 } = mockPages;
             switch (url) {
                 case 'https://example.com/page1':
                     return Promise.resolve({data: page1, status: 200});
@@ -94,7 +68,7 @@ describe(WebCrawler.name, () => {
         expect(links).toEqual(new Set([
             'https://example.com/page1',
             'https://example.com/page2',
-            'https://example.com/page3'
+            'https://example.com/page3',
         ]));
     });
 
