@@ -1,32 +1,41 @@
 import axios from "axios";
+import { describe } from "node:test";
 import { WebCrawler } from '../src/crawler';
+import { Logger } from "../src/logger";
 
 jest.mock('axios');
-const mockedAxios = axios as jest.Mocked<typeof axios>;
+jest.mock('../src/logger');
 
-beforeEach(() => {
-    mockedAxios.get.mockReset();
-});
+describe(WebCrawler.name, () => {
+    let mockedAxios: jest.Mocked<typeof axios>;
 
-test('Web Crawler class should be defined', async () => {
-    const crawler = new WebCrawler('https://example.com');
-    expect(crawler).toBeDefined();
-});
-
-test('Web Crawler can fetch page content', async () => {
-    mockedAxios.get.mockImplementation(async () => {
-        return Promise.resolve({data: '<html></html>'});
+    beforeEach(() => {
+        mockedAxios = axios as jest.Mocked<typeof axios>;
     });
 
-    const crawler = new WebCrawler('https://example.com');
-    const content = await crawler.fetchPageContent();
-    expect(content).toContain('<html>');
-});
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
 
-test('Web Crawler can extract links from page content', async () => {
-    const crawler = new WebCrawler('https://example.com');
+    test('Web Crawler class should be defined', async () => {
+        const crawler = new WebCrawler('https://example.com');
+        expect(crawler).toBeDefined();
+    });
 
-    const htmlContent = `
+    test('Web Crawler can fetch page content', async () => {
+        mockedAxios.get.mockImplementation(async () => {
+            return Promise.resolve({data: '<html></html>', status: 200});
+        });
+
+        const crawler = new WebCrawler('https://example.com');
+        const content = await crawler.fetchPageContent();
+        expect(content).toContain('<html>');
+    });
+
+    test('Web Crawler can extract links from page content', async () => {
+        const crawler = new WebCrawler('https://example.com');
+
+        const htmlContent = `
     <html>
       <body>
         <a href="http://example.com/page1">Page 1</a>
@@ -35,13 +44,13 @@ test('Web Crawler can extract links from page content', async () => {
     </html>
   `;
 
-    const links = crawler.extractLinks(htmlContent);
-    expect(links).toEqual(new Set(['http://example.com/page1', 'https://example.com/page2']));
-});
+        const links = crawler.extractLinks(htmlContent);
+        expect(links).toEqual(new Set(['http://example.com/page1', 'https://example.com/page2']));
+    });
 
-test('WebCrawler can crawl multiple pages within the same domain', async () => {
+    test('WebCrawler can crawl multiple pages within the same domain', async () => {
 
-    const page1 = `
+        const page1 = `
     <html>
       <body>
         <a href="https://example.com/page2">Page 2</a>
@@ -50,7 +59,7 @@ test('WebCrawler can crawl multiple pages within the same domain', async () => {
     </html>
   `;
 
-    const page2 = `
+        const page2 = `
     <html>
       <body>
         <a href="https://example.com/page3">Page 3</a>
@@ -58,33 +67,54 @@ test('WebCrawler can crawl multiple pages within the same domain', async () => {
     </html>
   `;
 
-    const page3 = `
+        const page3 = `
     <html>
       <body>No links here</body>
     </html>
   `;
 
-    mockedAxios.get.mockImplementation(async (url: string) => {
-        switch (url) {
-            case 'https://example.com/page1':
-                return Promise.resolve({data: page1});
-            case 'https://example.com/page2':
-                return Promise.resolve({data: page2});
-            case 'https://example.com/page3':
-                return Promise.resolve({data: page3});
-            default:
-                return Promise.resolve({data: ''});
-        }
+        mockedAxios.get.mockImplementation(async (url: string) => {
+            switch (url) {
+                case 'https://example.com/page1':
+                    return Promise.resolve({data: page1, status: 200});
+                case 'https://example.com/page2':
+                    return Promise.resolve({data: page2, status: 200});
+                case 'https://example.com/page3':
+                    return Promise.resolve({data: page3, status: 200});
+                default:
+                    return Promise.resolve({data: ''});
+            }
+        });
+
+        const crawler = new WebCrawler('https://example.com/page1');
+        const links = await crawler.crawl();
+
+        console.log(links);
+
+        expect(links).toEqual(new Set([
+            'https://example.com/page1',
+            'https://example.com/page2',
+            'https://example.com/page3'
+        ]));
     });
 
-    const crawler = new WebCrawler('https://example.com/page1');
-    const links = await crawler.crawl();
 
-    console.log(links);
+    test('Web Crawler should log and handle a Network Error', async () => {
+        const error = new Error('Network Error');
+        mockedAxios.get.mockRejectedValue(error);
 
-    expect(links).toEqual(new Set([
-        'https://example.com/page1',
-        'https://example.com/page2',
-        'https://example.com/page3'
-    ]));
+        const crawler = new WebCrawler('https://example.com');
+        await crawler.fetchPageContent();
+
+        expect(Logger.error).toHaveBeenCalledWith('Error fetching page', error);
+    });
+
+    test('Web Crawler should log and handle non-200 HTTP status codes', async () => {
+        mockedAxios.get.mockResolvedValue({status: 404});
+
+        const crawler = new WebCrawler('https://example.com');
+        await crawler.fetchPageContent();
+
+        expect(Logger.error).toHaveBeenCalledWith('Error fetching page: 404');
+    });
 });

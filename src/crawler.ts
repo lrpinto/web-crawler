@@ -16,6 +16,12 @@ export class WebCrawler {
     async fetchPageContent(url: string = this.startUrl): Promise<string> {
         try {
             const response = await axios.get(url);
+
+            if (response.status !== 200) {
+                Logger.error(`Error fetching page: ${response.status}`);
+                return '';
+            }
+
             return response.data;
         } catch (error) {
             Logger.error(`Error fetching page`, error);
