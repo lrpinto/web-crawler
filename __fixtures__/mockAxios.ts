@@ -20,7 +20,7 @@ export const mockAxiosGet = (urlMap: Record<string, Pick<AxiosResponse, 'data' |
         if (urlMap[url]) {
             return Promise.resolve({
                 data: urlMap[url].data,
-                status: urlMap[url].status || 200,
+                status: urlMap[url].status,
             });
         }
         return Promise.resolve({ data: '', status: 404});

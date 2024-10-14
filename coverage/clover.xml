@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1728899640106" clover="3.2.0">
-  <project timestamp="1728899640106" name="All files">
-    <metrics statements="63" coveredstatements="63" conditionals="16" coveredconditionals="15" methods="14" coveredmethods="14" elements="93" coveredelements="92" complexity="0" loc="63" ncloc="63" packages="2" files="6" classes="6"/>
+<coverage generated="1728899793870" clover="3.2.0">
+  <project timestamp="1728899793870" name="All files">
+    <metrics statements="63" coveredstatements="63" conditionals="14" coveredconditionals="14" methods="14" coveredmethods="14" elements="91" coveredelements="91" complexity="0" loc="63" ncloc="63" packages="2" files="6" classes="6"/>
     <package name="__fixtures__">
-      <metrics statements="11" coveredstatements="11" conditionals="3" coveredconditionals="2" methods="3" coveredmethods="3"/>
+      <metrics statements="11" coveredstatements="11" conditionals="1" coveredconditionals="1" methods="3" coveredmethods="3"/>
       <file name="mockAxios.ts" path="/Users/luisapinto/WebstormProjects/web-crawler/__fixtures__/mockAxios.ts">
-        <metrics statements="8" coveredstatements="8" conditionals="3" coveredconditionals="2" methods="3" coveredmethods="3"/>
+        <metrics statements="8" coveredstatements="8" conditionals="1" coveredconditionals="1" methods="3" coveredmethods="3"/>
         <line num="1" count="1" type="stmt"/>
         <line num="4" count="1" type="stmt"/>
         <line num="7" count="1" type="stmt"/>
