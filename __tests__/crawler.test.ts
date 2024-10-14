@@ -70,7 +70,8 @@ describe(WebCrawler.name, () => {
     });
 
     test('Web Crawler should log and handle non-200 HTTP status codes', async () => {
-        mockedAxios.get.mockResolvedValue({ data: '', status: 404 });
+        //mockedAxios.get.mockResolvedValue({ data: '', status: 404 });
+        mockAxiosGet({});
 
         const crawler = new WebCrawler(startUrl);
         await crawler.fetchPageContent();
