@@ -15,12 +15,12 @@ describe(WebCrawler.name, () => {
         jest.clearAllMocks();
     });
 
-    test('Web Crawler class should be defined', async () => {
+    test('WebCrawler class should be defined', async () => {
         const crawler = new WebCrawler(startUrl);
         expect(crawler).toBeDefined();
     });
 
-    test('Web Crawler can fetch page content', async () => {
+    test('WebCrawler can fetch page content', async () => {
         mockAxiosGet({
             [startUrl]: {data: '<html></html>', status: 200}
         })
@@ -30,7 +30,7 @@ describe(WebCrawler.name, () => {
         expect(content).toContain('<html>');
     });
 
-    test('Web Crawler can extract links from page content', async () => {
+    test('WebCrawler can extract links from page content', async () => {
         const crawler = new WebCrawler(startUrl);
 
         const links = crawler.extractLinks(mockPages.page1);
@@ -59,7 +59,7 @@ describe(WebCrawler.name, () => {
     });
 
 
-    test('Web Crawler should log and handle a Network Error', async () => {
+    test('WebCrawler should log and handle a Network Error', async () => {
         const error = new Error('Network Error');
         mockedAxios.get.mockRejectedValue(error);
 
@@ -69,7 +69,7 @@ describe(WebCrawler.name, () => {
         expect(Logger.error).toHaveBeenCalledWith('Error fetching page', expect.any(Error));
     });
 
-    test('Web Crawler should log and handle non-200 HTTP status codes', async () => {
+    test('WebCrawler should log and handle non-200 HTTP status codes', async () => {
         //mockedAxios.get.mockResolvedValue({ data: '', status: 404 });
         mockAxiosGet({});
 
@@ -111,5 +111,19 @@ describe(WebCrawler.name, () => {
         const links = await crawler.crawl();
 
         expect(Logger.info).toHaveBeenCalledWith('Already visited: ' + page1Url);
+    });
+
+    test('WebCrawler not extract links from empty page', async () => {
+        jest.spyOn(WebCrawler.prototype, 'fetchPageContent').mockResolvedValueOnce('');
+        jest.spyOn(WebCrawler.prototype, 'extractLinks');
+
+        const crawler = new WebCrawler(startUrl);
+        const links = await crawler.crawl();
+
+        expect(links).toEqual(new Set([
+            startUrl
+        ]));
+
+        expect(crawler.extractLinks).not.toHaveBeenCalled();
     });
 });
