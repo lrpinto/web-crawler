@@ -96,4 +96,20 @@ describe(WebCrawler.name, () => {
             page2Url,
         ]));
     });
+
+    test('WebCrawler should not visit the same page twice', async () => {
+        const { page1Url } = mockUrls;
+        const { page1 } = mockCyclicPages;
+
+        mockAxiosGet({
+            [page1Url]: { data: page1, status: 200 },
+        });
+
+        jest.spyOn(Set.prototype, 'has').mockImplementationOnce((page1Url) => true);
+
+        const crawler = new WebCrawler(page1Url);
+        const links = await crawler.crawl();
+
+        expect(Logger.info).toHaveBeenCalledWith('Already visited: ' + page1Url);
+    });
 });
